@@ -1,6 +1,48 @@
 <html>
   <head>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
   </head>
   <body>
+  <script type="text/javascript">
+    function Tile(){
+      return {
+        base: 'tiles/iso_tile.png',
+        map: 'tiles/iso_tile_map.png',
+        x: 0,
+        y: 0,
+      };
+    }
+
+    for(x = 0; x < 50; x++){
+      for(y = 0; y < 20; y++){
+        var t = new Tile();
+
+        var i = document.createElement('img');
+        var c = document.createElement('canvas');
+
+        i.src = t.base;
+
+        t.x = x * i.width/2 - 1;
+        t.y = x % 2 == 0 ? y * (i.height-1) : y * (i.height-1) + (i.height-1)/2;
+
+        i.style.position = 'absolute';
+        i.style.top = t.y;
+        i.style.left = t.x;
+        
+        i.onmouseover = function(e){
+          alert(t.x + ', ' + t.y);
+          var m = document.createElement('img');
+          m.src = 'tiles/iso_tile_hilite.png';
+          m.style.position = 'absolute';
+          m.style.top = t.y;
+          m.style.left = t.x;
+          m.onmouseout = function(e){ e.target.parentNode.removeChild(e.target); e.preventDefault() };
+          document.body.appendChild(m);
+          e.preventDefault();
+        };
+        document.body.appendChild(i);
+      }
+    }
+  </script>
   </body>
 </html>
