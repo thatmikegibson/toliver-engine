@@ -1,0 +1,41 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <div id="mp" style="position:absolute;top:0;right:0;z-index:99;background-color:white"></div>
+    <script type="text/javascript">
+    var map = new Array(100);
+    for(a=0;a<100;a++){
+      map[a] = new Array();
+      for(b=0;b<100;b++){
+        map[a][b] = Math.floor(Math.random()*5);
+      }
+    }
+
+    Element.prototype.x = function(){ return (this.style.left.match('[0-9]+'))[0] };
+    Element.prototype.y = function(){ return (this.style.top.match('[0-9]+'))[0] };
+    Element.prototype.animate = function(){ 
+      var pos = this.style.backgroundPosition.match(new RegExp('-?[0-9]+', 'g'));
+      pos[0] = pos[0] - 32;
+      if(-pos[0] > 32 * 4) pos[0] = 0;
+      this.style.backgroundPosition = pos[0] + ' ' + pos[1] + '';
+    };
+
+    var a = 0;
+    var img_src = 'tiles/tile.png';
+    for(x=0;x<Math.floor(window.innerWidth/32);x++){
+      for(y=0;y<Math.floor(window.innerHeight/32);y++){
+        var i = document.createElement('span');
+        i.style.background = '#fff url("tiles/tiles.png") no-repeat scroll ' + (-map[x][y]*32) + 'px ' + 0;
+        i.style.position = 'absolute';
+        i.style.top = y * 32;
+        i.style.left = x * 32;
+        i.style.width = '32px';
+        i.style.height = '32px';
+        i.zIndex = 1;
+        document.body.appendChild(i);
+      }
+    }
+    </script>
+  </body>
+</html>
