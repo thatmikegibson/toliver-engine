@@ -4,11 +4,13 @@
   <body>
     <div id="mp" style="position:absolute;top:0;right:0;z-index:99;background-color:white"></div>
     <script type="text/javascript">
+    var t_h = t_w = 40;
+
     var map = new Array(100);
     for(a=0;a<100;a++){
       map[a] = new Array();
       for(b=0;b<100;b++){
-        map[a][b] = Math.floor(Math.random()*5);
+        map[a][b] = Math.floor(Math.random()*7);
       }
     }
 
@@ -17,24 +19,28 @@
     Element.prototype.y = function(){ return (this.style.top.match('[0-9]+'))[0] };
     Element.prototype.animate = function(){ 
       var elem = this;
-      this.style.backgroundPosition = (-Math.floor(Math.random() * 5) * 32) +  'px ' + 0;
+      this.style.backgroundPosition = (-Math.floor(Math.random() * 7) * t_w) +  'px ' + 0;
+
+      /* disable animation for the time being*/
+      this.anim_interval = 1;
       if( this.anim_interval =='' ){
         this.anim_interval = setInterval(function(){elem.animate()},50);
       }
     };
 
     var a = 0;
-    var img_src = 'tiles/tile.png';
-    for(x=0;x<Math.floor(window.innerWidth/32);x++){
-      for(y=0;y<Math.floor(window.innerHeight/32);y++){
+    for(x=0;x<Math.floor(window.innerWidth/t_w);x++){
+      for(y=0;y<Math.floor(window.innerHeight/t_h);y++){
         var i = document.createElement('span');
-        i.style.background = '#fff url("tiles/tiles.png") no-repeat scroll ' + (-map[x][y]*32) + 'px ' + 0;
+        i.foo = 'bar ' + x * 40 + y;
+        i.style.background = '#fff url("tiles/tileset.png") no-repeat scroll ' + (-map[x][y]*t_w) + 'px ' + 0;
         i.style.position = 'absolute';
-        i.style.top = y * 32;
-        i.style.left = x * 32;
-        i.style.width = '32px';
-        i.style.height = '32px';
+        i.style.left = x * t_w;
+        i.style.top = y * t_h;
+        i.style.width = t_w + 'px';
+        i.style.height = t_h + 'px';
         i.zIndex = 1;
+        i.addEventListener('mouseover', function(){ document.getElementById('mp').innerHTML = this.foo } , false);
         i.animate();
         document.body.appendChild(i);
       }
