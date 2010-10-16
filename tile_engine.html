@@ -12,13 +12,15 @@
       }
     }
 
+    Element.prototype.anim_interval = '';
     Element.prototype.x = function(){ return (this.style.left.match('[0-9]+'))[0] };
     Element.prototype.y = function(){ return (this.style.top.match('[0-9]+'))[0] };
     Element.prototype.animate = function(){ 
-      var pos = this.style.backgroundPosition.match(new RegExp('-?[0-9]+', 'g'));
-      pos[0] = pos[0] - 32;
-      if(-pos[0] > 32 * 4) pos[0] = 0;
-      this.style.backgroundPosition = pos[0] + ' ' + pos[1] + '';
+      var elem = this;
+      this.style.backgroundPosition = (-Math.floor(Math.random() * 5) * 32) +  'px ' + 0;
+      if( this.anim_interval =='' ){
+        this.anim_interval = setInterval(function(){elem.animate()},50);
+      }
     };
 
     var a = 0;
@@ -33,6 +35,7 @@
         i.style.width = '32px';
         i.style.height = '32px';
         i.zIndex = 1;
+        i.animate();
         document.body.appendChild(i);
       }
     }
