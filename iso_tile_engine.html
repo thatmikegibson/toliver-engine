@@ -30,12 +30,11 @@
         i.style.left = t.x;
         
         i.onmouseover = function(e){
-          alert(t.x + ', ' + t.y);
           var m = document.createElement('img');
           m.src = 'tiles/iso_tile_hilite.png';
           m.style.position = 'absolute';
-          m.style.top = t.y;
-          m.style.left = t.x;
+          m.style.top = e.target.style.top;
+          m.style.left = e.target.style.left;
           m.onmouseout = function(e){ e.target.parentNode.removeChild(e.target); e.preventDefault() };
           document.body.appendChild(m);
           e.preventDefault();
