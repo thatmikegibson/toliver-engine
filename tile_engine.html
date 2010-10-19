@@ -1,50 +1,99 @@
 <html>
   <head>
+    <style>
+      * { margin: 0; padding: 0; }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
   </head>
   <body>
-    <div id="mp" style="position:absolute;top:0;right:0;z-index:99;background-color:white"></div>
     <script type="text/javascript">
-    var t_h = t_w = 40;
+    var TILE_HEIGHT = TILE_WIDTH = 40;
+    var MAP_WIDTH = Math.floor(window.innerWidth / TILE_WIDTH);
+    var MAP_HEIGHT = Math.floor(window.innerHeight / TILE_HEIGHT);
 
-    var map = new Array(100);
-    for(a=0;a<100;a++){
-      map[a] = new Array();
-      for(b=0;b<100;b++){
-        map[a][b] = Math.floor(Math.random()*7);
-      }
+    function Editor(){
+      var Palette = function(tileset_file){
+        var tileset = document.createElement('img');
+        tileset.src = tileset_file;
+
+        p = document.createElement('div');
+        p.id = 'palette';
+        p.style.position = 'absolute';
+        p.style.backgroundColor = '#fff';
+        p.style.border = '1px solid #000';
+        p.style.padding = '5px';
+        p.style.zIndex = '999';
+
+        p.addEventListener( 'click', function(e){ if(e.target.palette_index !== undefined){ this.selectedTile = e.target } }, false );
+
+        
+        $(p).draggable();
+
+        p.addpendChild(handle);
+        
+        p.tiles = new Array();
+        for(var i = 0; i < tileset.width; i += TILE_WIDTH){
+          for(var j = 0; j < tileset.height; j += TILE_HEIGHT){
+            var t = new PaletteTile(tileset_file, i, j, p.tiles.length);
+            p.tiles.push(t);
+            p.appendChild(t);
+          }
+        }
+        return p;
+      };
+
+      var PaletteTile = function(tileset, ts_x, ts_y, t_num){
+        var t = document.createElement('span');
+        t.style.display = 'inline-block';
+        t.style.height = TILE_HEIGHT;
+        t.style.width = TILE_WIDTH;
+        t.style.background = '#fff url("' + tileset + '") no-repeat scroll ' + (-ts_x) + 'px ' + (-ts_y) + 'px';
+        t.style.margin = '0 2px';
+        t.style.cursor = 'pointer';
+        t.style.border = '1px solid #000';
+        t.addEventListener( 'mouseover', function(e){ this.style.border = '1px solid #0ff'; }, false );
+        t.addEventListener( 'mouseout', function(e){ this.style.border = '1px solid #000'; }, false );
+        t.palette_index = t_num;
+        return t;
+      };
+
+      return {
+        selectedTile: null,
+        tileset: 'tiles/tileset.png',
+        palette: null,
+        renderPalette: function(){
+          var palette = document.getElementById('palette');
+          if(!palette) palette = new Palette(this.tileset);
+          this.palette = palette;
+          document.body.appendChild(palette);
+        },
+      };
     }
 
-    Element.prototype.anim_interval = '';
-    Element.prototype.x = function(){ return (this.style.left.match('[0-9]+'))[0] };
-    Element.prototype.y = function(){ return (this.style.top.match('[0-9]+'))[0] };
-    Element.prototype.animate = function(){ 
-      var elem = this;
-      this.style.backgroundPosition = (-Math.floor(Math.random() * 7) * t_w) +  'px ' + 0;
+    var e = new Editor;
+    e.renderPalette();
 
-      /* disable animation for the time being*/
-      this.anim_interval = 1;
-      if( this.anim_interval =='' ){
-        this.anim_interval = setInterval(function(){elem.animate()},50);
-      }
-    };
-
-    var a = 0;
-    for(x=0;x<Math.floor(window.innerWidth/t_w);x++){
-      for(y=0;y<Math.floor(window.innerHeight/t_h);y++){
-        var i = document.createElement('span');
-        i.foo = 'bar ' + x * 40 + y;
-        i.style.background = '#fff url("tiles/tileset.png") no-repeat scroll ' + (-map[x][y]*t_w) + 'px ' + 0;
-        i.style.position = 'absolute';
-        i.style.left = x * t_w;
-        i.style.top = y * t_h;
-        i.style.width = t_w + 'px';
-        i.style.height = t_h + 'px';
-        i.zIndex = 1;
-        i.addEventListener('mouseover', function(){ document.getElementById('mp').innerHTML = this.foo } , false);
-        i.animate();
-        document.body.appendChild(i);
+    var map = document.createElement('div');
+    map.style.position = 'relative';
+    map.style.background = '#fff url("tiles/grid.png") repeat scroll';
+    map.style.width = MAP_WIDTH * TILE_WIDTH;
+    map.style.height = MAP_HEIGHT * TILE_HEIGHT;
+    for(var y = 0; y < MAP_HEIGHT; y++){
+      for(var x = 0; x < MAP_WIDTH; x++){
+        var t = document.createElement('span');
+        t.style.display = 'block';
+        t.style.position = 'absolute';
+        t.style.left = x * TILE_WIDTH;
+        t.style.top = y * TILE_HEIGHT;
+        t.style.width = TILE_WIDTH;
+        t.style.height = TILE_HEIGHT;
+        t.style.zIndex = 1;
+        t.addEventListener('click', function(){ if(e.palette.selectedTile){ this.style.background = e.palette.selectedTile.style.background } }, false);
+        map.appendChild(t);
       }
     }
+    document.body.appendChild(map);
     </script>
   </body>
 </html>
