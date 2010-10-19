@@ -48,8 +48,8 @@
 
     function MouseHandler(){
       var m = { mousedown: 0 };
-      $(document.body).mousedown(function(e){ m.mousedown++; e.preventDefault() });
-      $(document.body).mouseup(function(e){ m.mousedown--; e.preventDefault() });
+      $(document.body).mousedown(function(e){ m.mousedown = 1; e.preventDefault() });
+      $(document.body).mouseup(function(e){ m.mousedown = 0; e.preventDefault() });
       return m;
     }
 
