@@ -1,4 +1,15 @@
 TODO:
+Map Editor
 Map Engine
 Sprite Engine
 Pathfinding?
+
+
+Map Structure:
+  0 parralax layer
+  1 tile layer
+  2 overlay layer
+  3 collision map
+  4 height map
+  5 trigger layer
+  6 sprite layer
