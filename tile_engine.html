@@ -2,95 +2,141 @@
   <head>
     <style>
       * { margin: 0; padding: 0; }
+
+      div.map.editing {
+        position: relative;
+        background: #fff url("tiles/grid.png") repeat scroll;
+      }
+
+      span.tile {
+        display: block;
+        position: absolute;
+        z-index: 1;
+      }
+
+      div.palette {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #000;
+        padding: 10px;
+        z-index: 999;
+        width: 830px;
+        -moz-border-radius: 8px;
+      }
+
+      span.palette-tile {
+        display: inline-block;
+        cursor: pointer;
+        border: 1px solid #000;
+        margin: 2px;
+      }
+
+      span.palette-tile:hover, 
+      span.palette-tile-selected {
+        border: 1px solid #0ff;
+      }
     </style>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
   </head>
   <body>
     <script type="text/javascript">
+
     var TILE_HEIGHT = TILE_WIDTH = 40;
     var MAP_WIDTH = Math.floor(window.innerWidth / TILE_WIDTH);
     var MAP_HEIGHT = Math.floor(window.innerHeight / TILE_HEIGHT);
 
-    function Editor(){
-      var Palette = function(tileset_file){
-        var tileset = document.createElement('img');
-        tileset.src = tileset_file;
+    function MouseHandler(){
+      var m = { mousedown: 0 };
+      $(document.body).mousedown(function(e){ m.mousedown++; e.preventDefault() });
+      $(document.body).mouseup(function(e){ m.mousedown--; e.preventDefault() });
+      return m;
+    }
 
-        p = document.createElement('div');
-        p.id = 'palette';
-        p.style.position = 'absolute';
-        p.style.backgroundColor = '#fff';
-        p.style.border = '1px solid #000';
-        p.style.padding = '5px';
-        p.style.zIndex = '999';
+    function Palette(tileset_file){
+      var tileset = document.createElement('img');
+      tileset.src = tileset_file;
 
-        p.addEventListener( 'click', function(e){ if(e.target.palette_index !== undefined){ this.selectedTile = e.target } }, false );
+      p = document.createElement('div');
+      p.selectedTile = null;
+      p.tileset = tileset.src,
 
-        
-        $(p).draggable();
+      p.id = 'palette';
+      $(p).addClass('palette');
+      $(p).draggable();
 
-        p.addpendChild(handle);
-        
-        p.tiles = new Array();
+      $(p).click( function(e){
+        if(e.target.palette_index !== undefined){
+          $('.palette-tile-selected').removeClass('palette-tile-selected');
+          $(e.target).addClass('palette-tile-selected');
+          this.selectedTile = e.target;
+        } 
+      } );
+
+      var erase = document.createElement('span');
+      $(erase).width(TILE_WIDTH);
+      erase.style.height = TILE_HEIGHT;
+      erase.palette_index = -1;
+      $(erase).addClass('palette-tile');
+      p.appendChild(erase);
+
+      p.tiles = new Array();
+      for(var j = 0; j < tileset.height; j += TILE_HEIGHT){
         for(var i = 0; i < tileset.width; i += TILE_WIDTH){
-          for(var j = 0; j < tileset.height; j += TILE_HEIGHT){
-            var t = new PaletteTile(tileset_file, i, j, p.tiles.length);
-            p.tiles.push(t);
-            p.appendChild(t);
-          }
+          var t = document.createElement('span');
+          t.style.height = TILE_HEIGHT;
+          t.style.width = TILE_WIDTH;
+          t.style.background = 'url("' + tileset_file + '") no-repeat ' + (-i) + 'px ' + (-j) + 'px';
+          t.palette_index = p.tiles.length;
+          $(t).addClass('palette-tile');
+          p.tiles.push(t);
+          p.appendChild(t);
         }
-        return p;
-      };
+      }
+      return p;
+    };
 
-      var PaletteTile = function(tileset, ts_x, ts_y, t_num){
-        var t = document.createElement('span');
-        t.style.display = 'inline-block';
-        t.style.height = TILE_HEIGHT;
-        t.style.width = TILE_WIDTH;
-        t.style.background = '#fff url("' + tileset + '") no-repeat scroll ' + (-ts_x) + 'px ' + (-ts_y) + 'px';
-        t.style.margin = '0 2px';
-        t.style.cursor = 'pointer';
-        t.style.border = '1px solid #000';
-        t.addEventListener( 'mouseover', function(e){ this.style.border = '1px solid #0ff'; }, false );
-        t.addEventListener( 'mouseout', function(e){ this.style.border = '1px solid #000'; }, false );
-        t.palette_index = t_num;
-        return t;
-      };
-
+    function Editor(){
       return {
-        selectedTile: null,
-        tileset: 'tiles/tileset.png',
         palette: null,
-        renderPalette: function(){
+        render: function(){
           var palette = document.getElementById('palette');
-          if(!palette) palette = new Palette(this.tileset);
+          if(!palette) palette = new Palette('tiles/tileset.png');
           this.palette = palette;
           document.body.appendChild(palette);
         },
       };
+
+      return ed;
     }
 
-    var e = new Editor;
-    e.renderPalette();
+    var mh = new MouseHandler;
+
+    var ed = new Editor;
+    ed.render();
 
     var map = document.createElement('div');
-    map.style.position = 'relative';
-    map.style.background = '#fff url("tiles/grid.png") repeat scroll';
-    map.style.width = MAP_WIDTH * TILE_WIDTH;
-    map.style.height = MAP_HEIGHT * TILE_HEIGHT;
+    $(map).addClass('map editing');
+    $(map).width(MAP_WIDTH * TILE_WIDTH);
+    $(map).height(MAP_HEIGHT * TILE_HEIGHT);
+
+    map.tiles = new Array();
+    map.columns = MAP_WIDTH;
+    map.rows = MAP_HEIGHT;
+
     for(var y = 0; y < MAP_HEIGHT; y++){
+      map.tiles[y] = new Array();
       for(var x = 0; x < MAP_WIDTH; x++){
         var t = document.createElement('span');
-        t.style.display = 'block';
-        t.style.position = 'absolute';
+        $(t).addClass('tile');
         t.style.left = x * TILE_WIDTH;
         t.style.top = y * TILE_HEIGHT;
         t.style.width = TILE_WIDTH;
         t.style.height = TILE_HEIGHT;
-        t.style.zIndex = 1;
-        t.addEventListener('click', function(){ if(e.palette.selectedTile){ this.style.background = e.palette.selectedTile.style.background } }, false);
+        $(t).mousedown( function(e){ if(ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
+        $(t).mouseover( function(e){ if(mh.mousedown && ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
         map.appendChild(t);
+        map.tiles[y][x] = t;
       }
     }
     document.body.appendChild(map);
