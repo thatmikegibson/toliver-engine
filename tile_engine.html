@@ -3,8 +3,11 @@
     <style>
       * { margin: 0; padding: 0; }
 
-      div.map.editing {
+      div.map {
         position: relative;
+      }
+
+      div.map.editing {
         background: #fff url("tiles/grid.png") repeat scroll;
       }
 
@@ -43,8 +46,6 @@
     <script type="text/javascript">
 
     var TILE_HEIGHT = TILE_WIDTH = 40;
-    var MAP_WIDTH = Math.floor(window.innerWidth / TILE_WIDTH);
-    var MAP_HEIGHT = Math.floor(window.innerHeight / TILE_HEIGHT);
 
     function MouseHandler(){
       var m = { mousedown: 0 };
@@ -110,35 +111,43 @@
       return ed;
     }
 
-    var mh = new MouseHandler;
+    function Map(){
+      var m = document.createElement('div');
+      m.rows = Math.floor(window.innerHeight / TILE_HEIGHT);
+      m.columns = Math.floor(window.innerWidth / TILE_WIDTH);
+      m.tiles = new Array();
 
+      m.render = function(){
+        $(m).addClass('map editing');
+        $(m).width(m.columns * TILE_WIDTH);
+        $(m).height(m.rows * TILE_HEIGHT);
+
+        for(var y = 0; y < this.rows; y++){
+          map.tiles[y] = new Array();
+          for(var x = 0; x < this.columns; x++){
+            var t = document.createElement('span');
+            $(t).addClass('tile');
+            t.style.left = x * TILE_WIDTH;
+            t.style.top = y * TILE_HEIGHT;
+            t.style.width = TILE_WIDTH;
+            t.style.height = TILE_HEIGHT;
+            $(t).mousedown( function(e){ if(ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
+            $(t).mouseover( function(e){ if(mh.mousedown && ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
+            this.appendChild(t);
+            this.tiles[y][x] = t;
+          }
+        }
+      }
+      return m;
+    }
+
+    var mh = new MouseHandler;
     var ed = new Editor;
     ed.render();
 
-    var map = document.createElement('div');
-    $(map).addClass('map editing');
-    $(map).width(MAP_WIDTH * TILE_WIDTH);
-    $(map).height(MAP_HEIGHT * TILE_HEIGHT);
+    var map = new Map;
+    map.render();
 
-    map.tiles = new Array();
-    map.columns = MAP_WIDTH;
-    map.rows = MAP_HEIGHT;
-
-    for(var y = 0; y < MAP_HEIGHT; y++){
-      map.tiles[y] = new Array();
-      for(var x = 0; x < MAP_WIDTH; x++){
-        var t = document.createElement('span');
-        $(t).addClass('tile');
-        t.style.left = x * TILE_WIDTH;
-        t.style.top = y * TILE_HEIGHT;
-        t.style.width = TILE_WIDTH;
-        t.style.height = TILE_HEIGHT;
-        $(t).mousedown( function(e){ if(ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
-        $(t).mouseover( function(e){ if(mh.mousedown && ed.palette.selectedTile){ this.style.background = ed.palette.selectedTile.style.background } } );
-        map.appendChild(t);
-        map.tiles[y][x] = t;
-      }
-    }
     document.body.appendChild(map);
     </script>
   </body>
