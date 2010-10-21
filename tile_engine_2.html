@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <style>
+      * { margin: 0; padding: 0; }
+
+      div.map {
+        position: relative;
+      }
+
+      div.map.editing {
+        background: #fff url("tiles/grid.png") repeat scroll;
+      }
+
+      span.tile {
+        display: block;
+        position: absolute;
+        z-index: 1;
+      }
+
+      div.palette {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #000;
+        padding: 10px;
+        z-index: 999;
+        width: 830px;
+        -moz-border-radius: 8px;
+      }
+
+      span.palette-tile {
+        display: inline-block;
+        cursor: pointer;
+        border: 1px solid #000;
+        margin: 2px;
+      }
+
+      span.palette-tile:hover, 
+      span.palette-tile-selected {
+        border: 1px solid #0ff;
+      }
+    </style>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="lib/map.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+    var TILE_HEIGHT = TILE_WIDTH = 40;
+
+    function MouseHandler(){
+      var m = { mousedown: 0 };
+      $(document.body).mousedown(function(e){ m.mousedown = 1; e.preventDefault() });
+      $(document.body).mouseup(function(e){ m.mousedown = 0; e.preventDefault() });
+      return m;
+    }
+    var mh = new MouseHandler;
+    </script>
+  </body>
+</html>
