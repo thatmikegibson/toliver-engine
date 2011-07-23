@@ -1,9 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="lib/jquery.min.js"></script>
     <script src="lib/toliver.js"></script>
-    <script src="lib/viewport.js"></script>
+    <script src="lib/toliver/viewport.js"></script>
+    <script src="lib/toliver/map.js"></script>
+
+    <style>
+      .toliver-viewport {
+        border: 1px solid #000;
+      }
+
+      .toliver-map {
+        background: url('tiles/grid.png') repeat 0 0;
+      }
+    </style>
   </head>
   <body>
+    <script>
+      var m = new Toliver.Map(400,400);
+      var v = new Toliver.Viewport(200,200);
+      v.attachMap(m);
+      $('body').append(v.render(10,10));
+    </script>
   </body>
 </html>
