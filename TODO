@@ -5,6 +5,21 @@ Sprite Engine
 Pathfinding?
 
 
+Viewport (div, no overflow)
+  width
+  height
+  map
+
+Map:
+  tilesets
+  sprites
+  layers:
+    parallax layers
+    tile layer
+    sprite layer
+    overlay layer
+
+
 Map Structure:
   0 parralax layer
   1 tile layer
