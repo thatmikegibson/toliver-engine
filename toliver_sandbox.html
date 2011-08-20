@@ -5,6 +5,7 @@
     <script src="lib/toliver.js"></script>
     <script src="lib/toliver/viewport.js"></script>
     <script src="lib/toliver/map.js"></script>
+    <script src="lib/toliver/input_handler.js"></script>
 
     <style>
       .toliver-viewport {
@@ -18,10 +19,23 @@
   </head>
   <body>
     <script>
-      var m = new Toliver.Map(400,400);
-      var v = new Toliver.Viewport(200,200);
+      var m = new Toliver.Map(10000,10000);
+      var v = new Toliver.Viewport(500,500);
+      var i = new Toliver.InputHandler();
+      i.render();
       v.attachMap(m);
-      $('body').append(v.render(10,10));
+      $('body').append(v.render(10,100));
+
+      function ioLoop(){
+        if( i.keys[Toliver.KEY_RIGHT] ){ v.scrollRight(1) }
+        if( i.keys[Toliver.KEY_LEFT] ){ v.scrollLeft(1) }
+        if( i.keys[Toliver.KEY_UP] ){ v.scrollUp(1) }
+        if( i.keys[Toliver.KEY_DOWN] ){ v.scrollDown(1) }
+
+        setTimeout( ioLoop, 1 );
+      }
+
+      ioLoop();
     </script>
   </body>
 </html>
