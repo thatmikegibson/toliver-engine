@@ -5,6 +5,7 @@
     <script src="lib/toliver.js"></script>
     <script src="lib/toliver/viewport.js"></script>
     <script src="lib/toliver/map.js"></script>
+    <script src="lib/toliver/layer.js"></script>
     <script src="lib/toliver/input_handler.js"></script>
 
     <style>
@@ -28,9 +29,25 @@
   <body>
     <div class="stats"></div>
     <script>
-      var m = new Toliver.Map(10000,10000);
-      var v = new Toliver.Viewport(500,500);
+      var tiles = new Array();
+      for( var i = 0; i < 10; i++ ){
+        var row = new Array();
+        for( var j = 0; j < 10; j++ ){
+          row.push( Math.floor( Math.random() * 33 ) + 1 );
+        }
+        tiles.push( row );
+      }
+
+      var m = new Toliver.Map( { height: 4000, width: 4000 } );
+      var v = new Toliver.Viewport( { height: 240, width: 240 } );
       var i = new Toliver.InputHandler();
+      m.addLayer(
+        new Toliver.Layer( {
+          tileSet: 'tiles/tileset.png',
+          tiles: tiles
+        } )
+      );
+
       i.render();
       v.attachMap(m);
       $('body').append(v.render(10,100));
